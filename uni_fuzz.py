@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 
 import random
-
+import codecs
 from unicodedata import bidirectional
 from optparse import OptionParser
 
@@ -47,14 +47,14 @@ def categorize(lower, upper):
     based on the directionality of the character.
     """
     global unicode_dict
-    for x in xrange(lower, upper):
-        bidi = bidirectional(unichr(x))
+    for x in range(lower, upper):
+        bidi = bidirectional(chr(x))
         if len(bidi) == 0:
             bidi = "UNK"
-        if bidi in unicode_dict.keys():
-            unicode_dict[bidi].append(unichr(x))
+        if bidi in list(unicode_dict.keys()):
+            unicode_dict[bidi].append(chr(x))
         else:
-            unicode_dict[bidi] = [unichr(x)]
+            unicode_dict[bidi] = [chr(x)]
 
 def parse_ranges(file_name):
     """Grab the lines from the given file_name. Populate unicode_dict based on
@@ -68,8 +68,8 @@ def parse_ranges(file_name):
         categorize(lower, upper)
 
 def generate_random_unicode(length, types):
-    data = u""
-    for x in xrange(0, length):
+    data = ""
+    for x in range(0, length):
         bidi_type = random.choice(types)
         data      = data + random.choice(unicode_dict[bidi_type])
     return data
@@ -103,6 +103,8 @@ def main():
     parse_ranges('unicode_ranges.txt')
 
     print(generate_random_unicode(length, types))
+    with codecs.open("tempfile.txt", "w", "utf-16")  as tmp:
+        tmp.write(generate_random_unicode(length, types))
 
 
 if __name__=='__main__':
